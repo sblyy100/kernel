@@ -33,7 +33,7 @@ static int check_tcp_packet(struct sk_buff *skb);
 static int copy_stats(struct lwfw_stats *statbuff);
 
 /* Some function prototypes to be used by lwfw_fops below. */
-static int lwfw_ioctl(struct inode *inode, struct file *file,
+static int lwfw_ioctl(struct file *file,
               unsigned int cmd, unsigned long arg);
 static int lwfw_open(struct inode *inode, struct file *file);
 static int lwfw_release(struct inode *inode, struct file *file);
@@ -69,13 +69,10 @@ static unsigned short deny_port = 0x0000; /* TCP port to deny */
 * This is the interface device's file_operations structure
 */
 struct file_operations lwfw_fops = {
-  
-     .ioctl=lwfw_ioctl,
-
+     //.ioctl=lwfw_ioctl,
+     .unlocked_ioctl=lwfw_ioctl,
      .open=lwfw_open,
-
      .release=lwfw_release,
-                     
 };
 
 
@@ -236,7 +233,7 @@ static int set_port_rule(unsigned short port)
 /*
 * File operations functions for control device
 */
-static int lwfw_ioctl(struct inode *inode, struct file *file,
+static int lwfw_ioctl(struct file *file,
               unsigned int cmd, unsigned long arg)
 {
    int ret = 0;
