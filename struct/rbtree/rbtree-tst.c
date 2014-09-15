@@ -21,20 +21,21 @@
 
 struct mynode {
   	struct rb_node node;
-  	char *string;
+  	char *key;
+	char *value;
 };
 
 struct rb_root mytree = RB_ROOT;
 
-struct mynode * my_search(struct rb_root *root, char *string)
+struct mynode * my_search(struct rb_root *root, char *key)
 {
   	struct rb_node *node = root->rb_node;
 
   	while (node) {
-  		struct mynode *data = container_of(node, struct mynode, node);
+  		struct mynode *data = rb_entry(node, struct mynode, node);
 		int result;
 
-		result = strcmp(string, data->string);
+		result = strcmp(key, data->key);
 
 		if (result < 0)
   			node = node->rb_left;
@@ -52,8 +53,8 @@ int my_insert(struct rb_root *root, struct mynode *data)
 
   	/* Figure out where to put new node */
   	while (*new) {
-  		struct mynode *this = container_of(*new, struct mynode, node);
-  		int result = strcmp(data->string, this->string);
+  		struct mynode *this = container_of(*new, struct mynode, node);//equal to rb_entry
+  		int result = strcmp(data->key, this->key);
 
 		parent = *new;
   		if (result < 0)
@@ -74,9 +75,13 @@ int my_insert(struct rb_root *root, struct mynode *data)
 void my_free(struct mynode *node)
 {
 	if (node != NULL) {
-		if (node->string != NULL) {
-			free(node->string);
-			node->string = NULL;
+		if (node->key != NULL) {
+			free(node->key);
+			node->key = NULL;
+		}
+		if (node->value != NULL) {
+			free(node->value);
+			node->value = NULL;
 		}
 		free(node);
 		node = NULL;
@@ -89,23 +94,28 @@ int main()
 {
 
 	struct mynode *mn[NUM_NODES];
-
+	
 	/* *insert */
 	int i = 0;
 	printf("insert node from 1 to NUM_NODES(32): \n");
 	for (; i < NUM_NODES; i++) {
 		mn[i] = (struct mynode *)malloc(sizeof(struct mynode));
-		mn[i]->string = (char *)malloc(sizeof(char) * 4);
-		sprintf(mn[i]->string, "%d", i);
+		mn[i]->key = (char *)malloc(sizeof(char) * 4);
+		mn[i]->value = (char *)malloc(sizeof(char) * 4);
+		sprintf(mn[i]->key, "%d", i);
+		sprintf(mn[i]->value, "sb%d", i);
 		my_insert(&mytree, mn[i]);
 	}
 	
+	
 	/* *search */
 	struct rb_node *node;
+	struct mynode *my;
 	printf("search all nodes: \n");
-	for (node = rb_first(&mytree); node; node = rb_next(node))
-		printf("key = %s\n", rb_entry(node, struct mynode, node)->string);
-
+	for (node = rb_first(&mytree); node; node = rb_next(node)){
+		my = rb_entry(node,struct mynode,node);
+		printf("key = %s,value = %s\n", my->key,my->value);
+	}
 	/* *delete */
 	printf("delete node 20: \n");
 	struct mynode *data = my_search(&mytree, "20");
@@ -132,8 +142,28 @@ int main()
 
 	/* *search again*/
 	printf("search again:\n");
-	for (node = rb_first(&mytree); node; node = rb_next(node))
-		printf("key = %s\n", rb_entry(node, struct mynode, node)->string);
+	for (node = rb_first(&mytree); node; node = rb_next(node)){
+		my = rb_entry(node,struct mynode,node);
+		printf("key = %s,value = %s\n", my->key,my->value);
+	}
+	/*replace 14 with data sss4*/
+	struct mynode *new_node;
+		new_node = (struct mynode *)malloc(sizeof(struct mynode));
+		new_node->key = (char *)malloc(sizeof(char) * 4);
+		new_node->value = (char *)malloc(sizeof(char) * 4);
+		sprintf(new_node->key,"%d",14);
+		sprintf(new_node->value,"%s","sss4");
+	data = my_search(&mytree, "14");
+	if(data){
+		rb_replace_node(&data->node,new_node,&mytree);
+		my_free(data);
+	}
+	/* *search again*/
+	printf("search again:\n");
+	for (node = rb_first(&mytree); node; node = rb_next(node)){
+		my = rb_entry(node,struct mynode,node);
+		printf("key = %s,value = %s\n", my->key,my->value);
+	}
 	return 0;
 }
 
