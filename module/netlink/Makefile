@@ -2,6 +2,6 @@ MAKE=make
 BUILD_KERNEL=3.14.8-200.fc20.i686
 #KSRC = /usr/src/kernels/$(BUILD_KERNEL)
 KSRC = /lib/modules/`uname -r`/build
-obj-m := hello.o
-hello:
+obj-m := gnKernel.o
+gnKernel:
 	$(MAKE) -C $(KSRC) SUBDIRS=$(shell pwd) modules
