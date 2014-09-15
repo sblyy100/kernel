@@ -8,11 +8,18 @@ MODULE_DESCRIPTION("netlink test");
 struct sock *nl_sk = NULL;  
 void nl_data_ready (struct sock *sk, int len)  
 {  
+	wake_up_interruptible(sk->sk_sleep);  
+}  
+
+static int __init hello_init(void)
+{
 	struct sk_buff *skb = NULL;  
 	struct nlmsghdr *nlh = NULL;  
 	int err;  
 	u32 pid;      
-	wake_up_interruptible(sk->sleep);  
+	printk(KERN_ERR "hello world!\n");
+	nl_sk = netlink_kernel_create(NETLINK_GENERIC,nl_data_ready);  
+ /* wait for message coming down from user-space */  
 	skb = skb_recv_datagram(nl_sk, 0, 0, &err);  
 	nlh = (struct nlmsghdr *)skb->data;  
 	printk("%s: received netlink message payload:%s/n",  
@@ -23,14 +30,6 @@ void nl_data_ready (struct sock *sk, int len)
 	NETLINK_CB(skb).dst_pid = pid;  
 	NETLINK_CB(skb).dst_groups = 0;  /* unicast */  
 	netlink_unicast(nl_sk, skb, pid, MSG_DONTWAIT);  
-}  
-
-static int __init hello_init(void)
-{
-	printk(KERN_ERR "hello world!\n");
-	nl_sk = netlink_kernel_create(NETLINK_GENERIC,  
-                                   nl_data_ready);  
- /* wait for message coming down from user-space */  
 	return 0;
 }
 static void __exit hello_exit(void)
