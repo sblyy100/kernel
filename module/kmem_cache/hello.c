@@ -40,8 +40,12 @@ static int __init hello_init(void)
 }
 static void __exit hello_exit(void)
 {
-	if(kc)
-		kmem_cache_destroy(kc);
+	int err;
+	if(kc){
+		err = kmem_cache_destroy(kc);
+		if(err)
+			printk(KERN_ERR"kmem_cache destroy failed\n");
+	}
     printk(KERN_EMERG "hello exit!\n");
 }
 module_init(hello_init);
