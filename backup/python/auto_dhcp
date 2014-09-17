@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+while true;do
+ping www.baidu.com -c1 >& /dev/null  || dhclient
+sleep 1800
+done
