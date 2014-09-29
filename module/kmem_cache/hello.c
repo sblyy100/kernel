@@ -14,7 +14,7 @@ static int __init hello_init(void)
 {
 	struct obj *ol[20] = {NULL,};
 	int i;
-	kc = kmem_cache_create("test",10*sizeof(struct obj),0,0,NULL);
+	kc = kmem_cache_create("test",sizeof(struct obj),0,0,NULL);
 	if(!kc){
 		printk(KERN_ERR"cache alloc failed\n");
 		return -1;
@@ -40,12 +40,8 @@ static int __init hello_init(void)
 }
 static void __exit hello_exit(void)
 {
-	int err;
-	if(kc){
-		err = kmem_cache_destroy(kc);
-		if(err)
-			printk(KERN_ERR"kmem_cache destroy failed\n");
-	}
+	if(kc)
+		kmem_cache_destroy(kc);
     printk(KERN_EMERG "hello exit!\n");
 }
 module_init(hello_init);
