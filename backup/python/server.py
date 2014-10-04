@@ -177,7 +177,7 @@ class Http_action():
 	def run(self):
 		self.parse_action()
 		if self.cmd != "" and not debug:
-			os.system(self.cmd)
+			self.data = os.popen(self.cmd).read()
 		return self.data
 def write_log(buf):
 	print time.ctime()+''+buf+"\n"

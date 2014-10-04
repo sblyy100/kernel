@@ -5,4 +5,5 @@ action_list = {
 "/poweroff" : "poweroff",
 "/reboot" : "reboot",
 "/dhcp" : "dhclient &",
+"/caipiao":"python double_color.py",
 }
