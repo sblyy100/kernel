@@ -13,23 +13,32 @@ enum RULE_CMD{
 #define TEST_GENL_HDRLEN 0
 #define GENL_ID_TEST 0x110
 #define TEST_GENL_CMD 0x1
+struct rule{
+	int id;
+	union{
+		char from[DEV_NAME];
+		int from_index;
+	}
+	union{
+		char to[DEV_NAME];
+		int to_index;
+	}
+	int protocol;
+	int src;
+	int dst;
+	short sport;
+	short dport;
+	int action;
+};
 struct my_msg{
 	enum RULE_CMD cmd;//add delete modify
 	//int count;//rule count
 	
 	struct rule r[0];
 };
-struct rule{
-	int id;
-	char from[DEV_NAME];
-	char to[DEV_NAME];
-	int protocol;
-	int src;
-	int dst;
-	short sport;
-	short dport;
-	int from_index;
-	int to_index;
-	int action;
+struct nl_info{
+	struct nlmsghdr nh;
+	struct genlmsghdr genlhdr;
+	struct my_msg uh;
 };
 #endif

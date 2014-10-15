@@ -3,17 +3,27 @@
 #include <linux/kernel.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter_ipv4.h>
-#include <uapi/linux/netfilter_ipv4.h>
-#include "my_msg.h"
+#include <linux/list.h>
+#include "my_kernel.h"
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("SBL");
 MODULE_DESCRIPTION("netfilter test");
-
+extern struct rule * match_rule(struct list_head *rh,struct sk_buff *skb,struct net_device *in,struct net_device *out);
+extern int do_action(struct rule *r,struct sk_buff *skb);
+struct list_head r_set;
+static void init_rule(struct list_head *rh){
+	init_rule(rh);
+}
+static void fini_rule(struct list_head *rh){
+	struct rule *r,*n;
+	list_for_each_entry_safe(r,n,rh,list){
+		list_del(r);
+		kfree(r);
+	}
+}
 static void dump_rule(struct rule *r){
 	printk("rule-id:%u\n",r->id);
 	printk("rule-protocol:%u\n",r->protocol);
-	printk("rule-from-dev:%s\n",r->from);
-	printk("rule-to-dev:%s\n",r->to);
 	printk("rule-src:%u\n",r->src);
 	printk("rule-dst:%u\n",r->dst);
 	printk("rule-sport:%u\n",r->sport);
@@ -48,7 +58,7 @@ static int handle_firewall_cmd(struct sk_buff *skb, struct genl_info *info)
 		printk("genlhdr->version:%u\n",info->genlhdr->version);
 		if(my){
 			printk("my->cmd:%u\n",my->cmd);
-			r = my->r;
+			r = (struct rule*)my->data;
 			if(r){
 				handle_rule(r);
 			}
@@ -74,14 +84,19 @@ unsigned int firewall_func(unsigned int hooknum,
                        const struct net_device *out,
                        int (*okfn)(struct sk_buff *))
 {
-    return NF_ACCEPT;
+	struct rule *r;
+    r = match_rule(&r_set,skb,in,out);
+	if(r){
+		do_action(r,skb);
+	}
+	return NF_ACCEPT;
 }
 
 static struct nf_hook_ops nfho={
-    .hook = firewall_func;         /* 处理函数 */
-    .hooknum  = NF_IP_PRE_ROUTING; /* 使用IPv4的第一个hook */
-    .pf       = PF_INET;
-    .priority = NF_IP_PRI_FIRST;   /* 让我们的函数首先执行 */
+    .hook = firewall_func,
+    .hooknum  = NF_INET_PRE_ROUTING,
+    .pf       = PF_INET,
+    .priority = NF_IP_PRI_FIRST,
 };
 
 
@@ -115,6 +130,7 @@ static void undo_hook(void){
 /* 初始化程序 */
 int firewall_init(void)
 {
+	init_rule(&r_set);
 	genl_firewall_init();
 	do_hook();
 	return 0;
@@ -123,8 +139,9 @@ int firewall_init(void)
 /* 清除程序 */
 void firewall_exit(void)
 {
-	genl_firewall_exit();
 	undo_hook();
+	genl_firewall_exit();
+	fini_rule(&r_set);
 }
 module_init(firewall_init);
 module_exit(firewall_exit);
