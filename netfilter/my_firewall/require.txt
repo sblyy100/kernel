@@ -1,0 +1,7 @@
+1. match: protocol,ip(src,dst),tcp/udp(src port,dst port),tcp(syn,syn+ack,ack,push),device(from,to)
+2.action: reject,accept,drop
+3.netlink ctrl:
+-set
+-add
+-del
+-j

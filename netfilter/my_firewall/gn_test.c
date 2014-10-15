@@ -10,13 +10,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "my_msg.h"
-enum RULE_ACT{
-	RULE_NONE,
-	RULE_ADD,
-	RULE_DEL,
-	RULE_MOD,
-	RULE_END,
-};
 #define GENL_ID_TEST 0x110
 int main()
 {
