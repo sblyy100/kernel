@@ -1,23 +1,17 @@
-#include <linux/module.h>
-#include <net/genetlink.h>
-#include <linux/kernel.h>
-#include <linux/netfilter.h>
-#include <linux/netfilter_ipv4.h>
-#include <linux/list.h>
 #include "my_kernel.h"
+#include "firewall_handle.h"
+#include "main.h"
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("SBL");
 MODULE_DESCRIPTION("netfilter test");
-extern struct rule * match_rule(struct list_head *rh,struct sk_buff *skb,struct net_device *in,struct net_device *out);
-extern int do_action(struct rule *r,struct sk_buff *skb);
 struct list_head r_set;
 static void init_rule(struct list_head *rh){
-	init_rule(rh);
+	INIT_LIST_HEAD(rh);
 }
 static void fini_rule(struct list_head *rh){
 	struct rule *r,*n;
 	list_for_each_entry_safe(r,n,rh,list){
-		list_del(r);
+		list_del(&r->list);
 		kfree(r);
 	}
 }
@@ -46,9 +40,7 @@ static int handle_firewall_cmd(struct sk_buff *skb, struct genl_info *info)
 {
 		struct my_msg *my=NULL;
 		struct rule *r;
-		if(info->userhdr)			my = (struct my_msg*)info->userhdr;
-			my = (struct my_msg*)info->userhdr;
-        printk("[handle_test_cmd]start==>");
+        printk(KERN_ERR"[handle_test_cmd]start==>");
 		printk("snd_seq:%u\n",info->snd_seq);
 		printk("snd_pid:%u\n",info->snd_pid);
 		printk("nlhdr->nlmsg_len:%u\n",info->nlhdr->nlmsg_len);
@@ -56,11 +48,13 @@ static int handle_firewall_cmd(struct sk_buff *skb, struct genl_info *info)
 		printk("nlhdr->nlmsg_type:%u\n",info->nlhdr->nlmsg_type);
 		printk("genlhdr->cmd:%u\n",info->genlhdr->cmd);
 		printk("genlhdr->version:%u\n",info->genlhdr->version);
+		if(info->userhdr)
+			my = (struct my_msg*)info->userhdr;
 		if(my){
 			printk("my->cmd:%u\n",my->cmd);
 			r = (struct rule*)my->data;
 			if(r){
-				handle_rule(r);
+				//handle_rule(r);
 			}
 		}
 	return 0;
@@ -107,6 +101,7 @@ static int  genl_firewall_init(void)
 
 	if (genl_register_ops(&family, &ops))
 		goto err_unregister;
+	printk(KERN_ERR"success to register genltest interface\n");
 
 	return 0;
 
@@ -128,7 +123,7 @@ static void undo_hook(void){
     nf_unregister_hook(&nfho);
 }
 /* 初始化程序 */
-int firewall_init(void)
+int __init firewall_init(void)
 {
 	init_rule(&r_set);
 	genl_firewall_init();
@@ -137,11 +132,12 @@ int firewall_init(void)
 }
 
 /* 清除程序 */
-void firewall_exit(void)
+void __exit firewall_exit(void)
 {
 	undo_hook();
 	genl_firewall_exit();
 	fini_rule(&r_set);
+	printk(KERN_ERR"firewall exit\n");
 }
 module_init(firewall_init);
 module_exit(firewall_exit);

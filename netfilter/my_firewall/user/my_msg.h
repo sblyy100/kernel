@@ -1,11 +1,5 @@
-#ifndef _MY_KERNEL
-#define _MY_KERNEL
-#include "main.h"
-#define TEST_GENL_NAME "GENLTEST"
-#define TEST_GENL_VERSION 0x1
-#define GENL_ID_TEST 0x110
-#define TEST_GENL_CMD 0x1
-#define TEST_GENL_HDRLEN 0
+#ifndef _MY_MSG
+#define _MY_MSG
 #define DEV_NAME 16
 enum RULE_CMD{
 	RULE_NONE,
@@ -14,7 +8,10 @@ enum RULE_CMD{
 	RULE_MOD,
 	RULE_END,
 };
-
+#define TEST_GENL_NAME "GENLTEST"
+#define TEST_GENL_VERSION 0x1
+#define GENL_ID_TEST 0x110
+#define TEST_GENL_CMD 0x1
 struct rule{
 	int id;
 	union{
@@ -31,12 +28,16 @@ struct rule{
 	short sport;
 	short dport;
 	int action;
-	struct list_head list;
 };
 struct my_msg{
-	enum RULE_CMD cmd;//add delete modify
+	int cmd;//add delete modify
 	//int count;//rule count
 	
-	void *data;
+	struct rule r[0];
+};
+struct nl_info{
+	struct nlmsghdr nh;
+	struct genlmsghdr genlhdr;
+	struct my_msg uh;
 };
 #endif
