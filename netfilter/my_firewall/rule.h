@@ -37,6 +37,7 @@ struct my_msg{
 	enum RULE_CMD cmd;//add delete modify
 	//int count;//rule count
 	
-	void *data;
+	//void *data;
+	struct rule data[0];
 };
 #endif

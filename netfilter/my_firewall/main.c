@@ -39,7 +39,9 @@ static int handle_rule(struct rule *r){
 static int handle_firewall_cmd(struct sk_buff *skb, struct genl_info *info)
 {
 		struct my_msg *my=NULL;
+
 		struct rule *r;
+		struct nlattr *na;
         printk(KERN_ERR"[handle_test_cmd]start==>");
 		printk("snd_seq:%u\n",info->snd_seq);
 		printk("snd_pid:%u\n",info->snd_pid);
@@ -48,13 +50,14 @@ static int handle_firewall_cmd(struct sk_buff *skb, struct genl_info *info)
 		printk("nlhdr->nlmsg_type:%u\n",info->nlhdr->nlmsg_type);
 		printk("genlhdr->cmd:%u\n",info->genlhdr->cmd);
 		printk("genlhdr->version:%u\n",info->genlhdr->version);
-		if(info->userhdr)
-			my = (struct my_msg*)info->userhdr;
+		my = (struct my_msg*)genlmsg_data(info->genlhdr);
 		if(my){
 			printk("my->cmd:%u\n",my->cmd);
 			r = (struct rule*)my->data;
 			if(r){
-				//handle_rule(r);
+				handle_rule(r);
+			}else{
+				printk("rule empty!\n");
 			}
 		}
 	return 0;
