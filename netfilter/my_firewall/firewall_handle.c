@@ -1,4 +1,4 @@
-#include "my_kernel.h"
+#include "rule.h"
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("SBL");
 MODULE_DESCRIPTION("netfilter test");
