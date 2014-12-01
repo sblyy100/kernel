@@ -3,6 +3,7 @@ calc_price.py -w unit weight
 calc_price.py -r exchange rate
 calc_price.py -m transfer mode: 0:plane 1:sal 2:ship ,default is ship
 calc_price.py -h help
+#ship
 [sbl@baoliang post_price]$ python calc_price.py -w 2000 -m 2
 weight:2kg num:1 price:92
 weight:4kg num:2 price:59
@@ -14,3 +15,27 @@ weight:14kg num:7 price:34
 weight:16kg num:8 price:32
 weight:18kg num:9 price:31
 weight:20kg num:10 price:30
+#plane
+[sbl@baoliang post_price]$ python calc_price.py -w 2000 -m 0
+weight:2kg num:1 price:145
+weight:4kg num:2 price:109
+weight:6kg num:3 price:96
+weight:8kg num:4 price:88
+weight:10kg num:5 price:83
+weight:12kg num:6 price:76
+weight:14kg num:7 price:71
+weight:16kg num:8 price:67
+weight:18kg num:9 price:65
+weight:20kg num:10 price:62
+#SAL
+[sbl@baoliang post_price]$ python calc_price.py -w 2000 -m 1
+weight:2kg num:1 price:127
+weight:4kg num:2 price:95
+weight:6kg num:3 price:83
+weight:8kg num:4 price:75
+weight:10kg num:5 price:71
+weight:12kg num:6 price:64
+weight:14kg num:7 price:59
+weight:16kg num:8 price:56
+weight:18kg num:9 price:53
+weight:20kg num:10 price:51
