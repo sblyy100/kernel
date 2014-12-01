@@ -1,7 +1,9 @@
+[sbl@baoliang post_price]$ python calc_price.py -h
 calc_price.py -w unit weight
 calc_price.py -r exchange rate
 calc_price.py -m transfer mode: 0:plane 1:sal 2:ship ,default is ship
 calc_price.py -h help
+[sbl@baoliang post_price]$ python calc_price.py -w 2000 -m 2
 weight:2kg num:1 price:92
 weight:4kg num:2 price:59
 weight:6kg num:3 price:48
