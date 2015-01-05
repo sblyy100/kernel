@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE log4c SYSTEM "">
+<log4c>
+	<config>
+		<bufsize>0</bufsize>
+		<debug level="2"/>
+		<nocleanup>0</nocleanup>
+		<reread>1</reread>
+	</config>
+ 
+	<category name="root" priority="notice"/>
+	<category name="linuxany.com" priority="debug" appender="stderr" />
+	<category name="mine" priority="debug" appender="myrollingfileappender" />
+	<rollingpolicy name="myrollingpolicy" type="sizewin" maxsize="104857600" maxnum="10" />    
+        <!--sizewin 表示达到最大值后新建日志文件  值由maxsize设定
+            maxnum  最大文件数目 
+         -->
+
+ 
+	<appender name="myrollingfileappender" type="rollingfile" logdir="./" prefix="mylogfile" layout="dated" rollingpolicy="myrollingpolicy" />
+       <!--logdir 日志输出路径
+           prefix  文件名
+           layout 输出格式 （与下方layout对应）
+              例如dated为:
+09:21:10.167 WARN     log4ctest- [    main.c][  57][      main()]: shit!-99947
+09:21:10.167 WARN     log4ctest- [    main.c][  57][      main()]: shit!-99948
+09:21:10.167 WARN     log4ctest- [    main.c][  57][      main()]: shit!-99949
+              basic为:
+                  WARN     log4ctest - [    main.c][  57][      main()]: shit!-99982
+                  WARN     log4ctest - [    main.c][  57][      main()]: shit!-99983
+                  WARN     log4ctest - [    main.c][  57][      main()]: shit!-99984
+                  WARN     log4ctest - [    main.c][  57][      main()]: shit!-99985              
+
+        -->
+	<appender name="stdout" type="stream" layout="basic"/>
+	<appender name="stderr" type="stream" layout="dated"/>
+	<appender name="syslog" type="syslog" layout="basic"/>
+	<appender name="s13file" type="s13_file" layout="basic"/>
+	<appender name="plain_stderr" type="s13_stderr" layout="none"/>
+	<appender name="cat_stderr" type="s13_stderr" layout="catlayout"/>
+	<appender name="xml_stderr" type="s13_stderr" layout="xmllayout"/>
+	<appender name="user_stderr" type="s13_stderr" layout="userlayout"/>
+ 
+	<layout name="basic" type="basic"/>
+	<layout name="dated" type="dated"/>
+	<layout name="catlayout" type="s13_cat"/>
+	<layout name="xmllayout" type="s13_xml"/>
+	<layout name="none" type="s13_none"/>
+	<layout name="userlayout" type="s13_userloc"/>
+ 
+</log4c>
